@@ -1,0 +1,27 @@
+# Thư mục build của Gradle (Quan trọng nhất)
+# Sẽ bỏ qua toàn bộ thư mục /build, /bin
+build/
+bin/
+
+# Thư mục cache của Gradle
+.gradle/
+
+# Cài đặt cục bộ (ví dụ: đường dẫn SDK)
+local.properties
+
+# Cài đặt IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+
+# File hệ thống
+.DS_Store
+Thumbs.db
+
+# File log
+*.log
