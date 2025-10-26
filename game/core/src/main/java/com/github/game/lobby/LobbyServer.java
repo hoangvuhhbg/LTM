@@ -43,6 +43,76 @@ public class LobbyServer {
         }
     }
 
+    public void broadcastLobbyState() throws IOException {
+        ArrayList<Client> clients = new ArrayList<>();
+        synchronized (connectedClients) {
+            for (ClientHandler clientHandler : connectedClients){
+                if(clientHandler.getClient() != null) {
+                    clients.add(clientHandler.getClient());
+                }
+            }
+        }
+
+        System.out.println("Broadcasting lobby state... So luong: " + clients.size());
+
+        Packet updatePacket = new Packet(PacketType.SERVER_UPDATE_LOBBY, clients);
+        synchronized (connectedClients) {
+            for (ClientHandler clientHandler : connectedClients){
+                try {
+                    clientHandler.sendPacket(updatePacket);
+                } catch (IOException e) {
+                    System.err.println("Loi khi broadcast cho client " + clientHandler.getClientID());
+                }
+            }
+        }
+    }
+
+    public boolean areAllClientsReady(){
+        if (connectedClients.isEmpty()){
+            return false;
+        }
+        synchronized (connectedClients){
+            for (ClientHandler clientHandler : connectedClients){
+                if (!clientHandler.getClient().isReady() || clientHandler.getClient() == null){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void handleStartGameRequest(ClientHandler clientHandler) throws IOException {
+        if (clientHandler.getClientID() != HOST_ID){
+            clientHandler.sendPacket(new Packet(PacketType.SERVER_ERROR, "Khong phai Host de bat dau game"));
+            return;
+        }
+        if (areAllClientsReady()){
+            System.out.println("Host yeu cau bat dau... Tat ca da san sang!");
+
+            // Gửi tín hiệu bắt đầu cho TẤT CẢ
+            Packet startPacket = new Packet(PacketType.SERVER_START_GAME, "START");
+            for (ClientHandler handler : connectedClients) {
+                handler.sendPacket(startPacket);
+            }
+
+            // TODO: Gọi để chạy game
+        } else {
+            System.out.println("Host yeu cau bat dau... nhung co nguoi chua san sang.");
+            clientHandler.sendPacket(new Packet(PacketType.SERVER_ERROR, "Chua the bat dau, co nguoi chua san sang!"));
+        }
+    }
+
+    public boolean isNameTaken(String name) {
+        synchronized (connectedClients) {
+            for (ClientHandler handler : connectedClients) {
+                // Kiểm tra xem tên đã tồn tại và khác null chưa
+                if (handler.getClient() != null && handler.getClient().getName().equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public static void main(String[] args) {
         new LobbyServer().startServer();
     }

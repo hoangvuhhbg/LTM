@@ -20,22 +20,25 @@ public class LobbyClient {
     private boolean isHost = false;
     private boolean isReady = false;
 
-    public void start() throws IOException {
+    private ArrayList<Client> currentLobbyState = new ArrayList<>();
+
+    public void start() {
         try (Scanner scanner = new Scanner(System.in)) {
             String name = "";
             while (true) {
                 System.out.print("\nAn (1) de Tao Phong, (2) de Vao Phong: ");
                 String choice = scanner.nextLine();
 
-                // --- NHẬP TÊN ---
+                // Nhap ten
                 System.out.print("Nhap ten cua ban: ");
                 name = scanner.nextLine();
+
 
                 String serverIp;
                 if (choice.equals("1")) {
                     serverIp = "127.0.0.1";
-                    System.out.println("Dang tao phong...");
-                    System.out.println("IP Radmin VPN cua ban la IP phong cho nguoi khac vao phong.");
+                    System.out.println("Dang tao phong... (Hay chay LobbyServer.java truoc)");
+                    System.out.println("IP Radmin VPN cua ban la IP phong cho nguoi khac.");
                 } else if (choice.equals("2")) {
                     System.out.print("Nhap IP Radmin VPN cua Host: ");
                     serverIp = scanner.nextLine();
@@ -64,8 +67,40 @@ public class LobbyClient {
             sendPacket(joinRequest);
 
             new Thread(this::listenFromServer).start();
+
+            // Vòng lặp xử lý lệnh trong phòng
+            System.out.println("Go 'ready' de san sang/huy, 'start' de bat dau (neu la Host)");
+            while (true) {
+                String input = scanner.nextLine();
+
+                if (input.equalsIgnoreCase("ready")) {
+                    isReady = !isReady;
+                    Packet statusPacket = new Packet(PacketType.CLIENT_UPDATE_STATUS, isReady);
+                    sendPacket(statusPacket);
+                    System.out.println("Ban da cap nhat trang thai: " + (isReady ? "San sang" : "Chua san sang"));
+
+                } else if (input.equalsIgnoreCase("start")) {
+                    if (isHost) {
+                        Packet startRequest = new Packet(PacketType.CLIENT_REQUEST_START, null);
+                        sendPacket(startRequest);
+                    } else {
+                        System.out.println("Ban khong phai Host, khong thể bat dau game.");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Loi Client: " + e.getMessage());
+        } finally {
+            try {
+                if (socket != null) socket.close();
+                System.out.println("Da ngat ket noi.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     // Gửi gói tin lên server
     private void sendPacket(Packet packet) {
@@ -94,6 +129,20 @@ public class LobbyClient {
                             System.out.println("Ban da vao phong voi ID: " + this.myId);
                         }
                         break;
+                    case SERVER_UPDATE_LOBBY:
+                        this.currentLobbyState = (ArrayList<Client>) packet.getData();
+                        System.out.println("\n--- CAP NHAT PHONG CHO ("+ this.currentLobbyState.size() +" nguoi) ---");
+                        for (Client client : this.currentLobbyState) {
+                            System.out.println(client.toString() + (client.getId() == myId ? " (La ban)" : ""));
+                        }
+                        System.out.println("-------------------------------------");
+                        System.out.print("Lenh (ready/start): ");
+                        break;
+
+                    case SERVER_START_GAME:
+                        System.out.println("\n!!! GAME BAT DAU !!!");
+                        // TODO: Chuyển màn hình sang game chính
+                        return;
                     case SERVER_ERROR:
                         System.err.println("\n[LOI TU SERVER]: " + packet.getData().toString());
                         break;
@@ -105,7 +154,7 @@ public class LobbyClient {
             System.out.println("Server da ngat ket noi.");
         }
     }
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         new LobbyClient().start();
     }
 }

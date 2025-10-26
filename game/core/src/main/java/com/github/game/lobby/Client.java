@@ -13,7 +13,7 @@ public class Client implements Serializable {
         this.id = id;
         this.name = name;
         this.ip = ip;
-        this.isReady = false; // Luôn là chưa sẵn sàng khi mới tạo
+        this.isReady = (id == 0); // Luôn là chưa sẵn sàng khi mới tạo/ Host luôn sẵn sàng
     }
 
     public int getId() {
