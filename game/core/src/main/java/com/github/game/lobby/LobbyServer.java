@@ -113,6 +113,15 @@ public class LobbyServer {
         }
         return false;
     }
+
+    public void removeClient(ClientHandler clientHandler) throws IOException {
+        connectedClients.remove(clientHandler);
+        if (clientHandler.getClient() != null) {
+            System.out.println(clientHandler.getClient().getName() + " da roi phong.");
+            broadcastLobbyState();
+        }
+    }
+
     public static void main(String[] args) {
         new LobbyServer().startServer();
     }

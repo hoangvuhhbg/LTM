@@ -70,6 +70,12 @@ public class ClientHandler implements Runnable{
         } catch (Exception e) {
             System.out.println("Client ID " + clientID + " da ngat ket noi.");
         } finally {
+            // 1. Xóa người chơi khỏi phòng
+            try {
+                server.removeClient(this);
+            } catch (IOException e) {
+                System.err.println("Loi khi dang broadcast sau khi client " + clientID + " roi phong: " + e.getMessage());
+            }
             // Đóng tất cả kết nối
             try {
                 if (output != null) output.close();
