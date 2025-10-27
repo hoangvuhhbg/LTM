@@ -1,0 +1,89 @@
+# ============================
+# Java & Gradle Ignore Rules
+# ============================
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+*.xml
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# ============================
+# Gradle
+# ============================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local build cache
+.gradle-cache/
+.gradle/
+
+# Ignore Gradle lock and execution history
+*.lock
+buildOutputCleanup.lock
+executionHistory.bin
+fileHashes.bin
+checksums.lock
+gc.properties
+last-build.bin
+cache.properties
+
+# ============================
+# IntelliJ IDEA
+# ============================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# IntelliJ project-specific files
+/out/
+workspace.xml
+tasks.xml
+shelf/
+dataSources/
+dataSources.local.xml
+httpRequests/
+libraries/
+
+# ============================
+# OS-specific files
+# ============================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# ============================
+# Others
+# ============================
+/bin/
+/target/
